@@ -9,12 +9,7 @@ app.use(express.static(path.join(__dirname, 'public')))
 app.engine('handlebars', exhbs({defaultLayout: 'home'}))
 app.set('view engine', 'handlebars')
 
-app.get('/', (req,res) => {
-    res.render('home/index')
-})
-
-app.get('/about', (req,res) => {
-    res.render('home/about')
-})
+const main = require('./routes/home/main')
+app.use('/', main)
 
 app.listen(port, () => console.log(`Example app listening on port ${port}`))
