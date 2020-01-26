@@ -9,7 +9,9 @@ app.use(express.static(path.join(__dirname, 'public')))
 app.engine('handlebars', exhbs({defaultLayout: 'home'}))
 app.set('view engine', 'handlebars')
 
-const main = require('./routes/home/main')
-app.use('/', main)
+const home = require('./routes/home/route')
+const admin = require('./routes/admin/route')
+app.use('/', home)
+app.use('/admin', admin)
 
 app.listen(port, () => console.log(`Example app listening on port ${port}`))
