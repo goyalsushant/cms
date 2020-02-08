@@ -11,7 +11,10 @@ app.set('view engine', 'handlebars')
 
 const home = require('./routes/home/route')
 const admin = require('./routes/admin/route')
+const posts = require('./routes/admin/posts')
+
 app.use('/', home)
 app.use('/admin', admin)
+app.use('/admin/posts', posts)
 
 app.listen(port, () => console.log(`Example app listening on port ${port}`))
