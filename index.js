@@ -1,14 +1,33 @@
-var express = require('express')
-var path = require('path')
-var app = express()
-var exhbs = require('express-handlebars')
+const express = require('express')
+const path = require('path')
+const app = express()
+const exhbs = require('express-handlebars')
+const mongoose = require('mongoose')
+const bodyParser = require('body-parser')
+const methodOverride = require('method-override')
 const port = 3000
+
+mongoose.Promise = global.Promise;
+
+mongoose.connect('mongodb://127.0.1.17/cms', { useMongoCLient: true, useNewUrlParser: true }).then(db => {
+    console.log('Mongo database connected');
+}).catch(error => console.log(error));
 
 app.use(express.static(path.join(__dirname, 'public')))
 
-app.engine('handlebars', exhbs({defaultLayout: 'home'}))
+//View Engine
+const { select } = require('./helpers/handlebars-helper')
+app.engine('handlebars', exhbs({ defaultLayout: 'home', helpers: { select: select } }))
 app.set('view engine', 'handlebars')
 
+//Body Parser
+app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.json())
+
+//Method Over-ride
+app.use(methodOverride('_method'))
+
+// Route constants
 const home = require('./routes/home/route')
 const admin = require('./routes/admin/route')
 const posts = require('./routes/admin/posts')
