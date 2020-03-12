@@ -5,11 +5,12 @@ const exhbs = require('express-handlebars')
 const mongoose = require('mongoose')
 const bodyParser = require('body-parser')
 const methodOverride = require('method-override')
+const upload = require('express-fileupload')
 const port = 3000
 
 mongoose.Promise = global.Promise;
 
-mongoose.connect('mongodb://127.0.1.17/cms', { useMongoCLient: true, useNewUrlParser: true }).then(db => {
+mongoose.connect('mongodb://127.0.0.1:12017/cms', { useMongoCLient: true, useNewUrlParser: true }).then(db => {
     console.log('Mongo database connected');
 }).catch(error => console.log(error));
 
@@ -19,6 +20,9 @@ app.use(express.static(path.join(__dirname, 'public')))
 const { select } = require('./helpers/handlebars-helper')
 app.engine('handlebars', exhbs({ defaultLayout: 'home', helpers: { select: select } }))
 app.set('view engine', 'handlebars')
+
+//Upload Middleware
+app.use(upload())
 
 //Body Parser
 app.use(bodyParser.urlencoded({ extended: true }))

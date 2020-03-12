@@ -1,6 +1,9 @@
-var express = require('express')
-var router = express.Router()
-var Post = require('../../models/Post')
+const express = require('express')
+const router = express.Router()
+const Post = require('../../models/Post')
+const { isEmpty, uploadDir } = require('../../helpers/upload-helper')
+const fs = require('fs')
+const path = require('path')
 
 router.all('/*', (req, res, next) => {
     req.app.locals.layout = 'admin'
@@ -16,6 +19,7 @@ router.get('/', (req, res) => {
                     title: post.title,
                     id: post.id,
                     allowComments: post.allowComments,
+                    file: post.file,
                 }
             })
         }
@@ -31,6 +35,15 @@ router.get('/create', (req, res) => {
 
 router.post('/create', (req, res) => {
 
+    let filename = '';
+    if (!isEmpty(req.files)) {
+        let file = req.files.file
+        filename = Date.now() + '-' + file.name
+        file.mv('./public/uploads/' + filename, (err) => {
+            if (err) throw err
+        })
+    }
+
     let allowComments = true;
     if (req.body.allowComments) {
         allowComments = true;
@@ -39,15 +52,15 @@ router.post('/create', (req, res) => {
         allowComments = false;
     }
 
-    var newPost = new Post({
+    let newPost = new Post({
         title: req.body.title,
         status: req.body.status,
         allowComments: allowComments,
-        body: req.body.body
+        body: req.body.body,
+        file: filename
     })
 
     newPost.save().then(savedPost => {
-        console.log(savedPost)
         res.redirect('/admin/posts')
     }).catch(err => {
         console.log('Error occured while saving post. ', err)
@@ -92,10 +105,14 @@ router.put('/edit/:id', (req, res) => {
     })
 })
 
-router.delete('/:id', (req,res)=>{
-    Post.deleteOne({_id: req.params.id}).then(result=>{
-        res.redirect('/admin/posts')
-    }).catch(err=>{
+router.delete('/:id', (req, res) => {
+    Post.findOne({ _id: req.params.id }).then(post => {
+        fs.unlink(uploadDir + post.file, (err) => {
+            post.remove()
+            res.redirect('/admin/posts')
+
+        })
+    }).catch(err => {
         console.log(err)
     })
 })
