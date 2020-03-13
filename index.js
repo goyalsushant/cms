@@ -10,7 +10,7 @@ const port = 3000
 
 mongoose.Promise = global.Promise;
 
-mongoose.connect('mongodb://cmsuser:cmsuser123@ds261072.mlab.com:61072/cms', { useMongoCLient: true, useNewUrlParser: true }).then(db => {
+mongoose.connect('mongodb://localhost:27017/cms', { useMongoCLient: true, useNewUrlParser: true }).then(db => {
     console.log('Mongo database connected');
 }).catch(error => console.log(error));
 
