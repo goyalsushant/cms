@@ -35,36 +35,51 @@ router.get('/create', (req, res) => {
 
 router.post('/create', (req, res) => {
 
-    let filename = '';
-    if (!isEmpty(req.files)) {
-        let file = req.files.file
-        filename = Date.now() + '-' + file.name
-        file.mv('./public/uploads/' + filename, (err) => {
-            if (err) throw err
-        })
+    let errors = []
+    if (!req.body.title) {
+        errors.push({ message: 'Please enter title' })
+    }
+    if (!req.body.body) {
+        errors.push({ message: 'Please enter description' })
     }
 
-    let allowComments = true;
-    if (req.body.allowComments) {
-        allowComments = true;
+    if (errors.length > 0) {
+        res.render('admin/posts/create', { errors: errors })
     }
     else {
-        allowComments = false;
+
+
+        let filename = '';
+        if (!isEmpty(req.files)) {
+            let file = req.files.file
+            filename = Date.now() + '-' + file.name
+            file.mv('./public/uploads/' + filename, (err) => {
+                if (err) throw err
+            })
+        }
+
+        let allowComments = true;
+        if (req.body.allowComments) {
+            allowComments = true;
+        }
+        else {
+            allowComments = false;
+        }
+
+        let newPost = new Post({
+            title: req.body.title,
+            status: req.body.status,
+            allowComments: allowComments,
+            body: req.body.body,
+            file: filename
+        })
+
+        newPost.save().then(savedPost => {
+            res.redirect('/admin/posts')
+        }).catch(err => {
+            console.log('Error occured while saving post. ', err)
+        })
     }
-
-    let newPost = new Post({
-        title: req.body.title,
-        status: req.body.status,
-        allowComments: allowComments,
-        body: req.body.body,
-        file: filename
-    })
-
-    newPost.save().then(savedPost => {
-        res.redirect('/admin/posts')
-    }).catch(err => {
-        console.log('Error occured while saving post. ', err)
-    })
 })
 
 router.get('/edit/:id', (req, res) => {
