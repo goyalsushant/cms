@@ -6,19 +6,21 @@ router.all('/*', (req, res, next) => {
     next()
 })
 
-router.get('/', (req,res) => {
+router.get('/', (req, res) => {
+    req.session.value = 'hello'
+    // if (req.session)
     res.render('home/index')
 })
 
-router.get('/about', (req,res) => {
+router.get('/about', (req, res) => {
     res.render('home/about')
 })
 
-router.get('/login', (req,res) => {
+router.get('/login', (req, res) => {
     res.render('home/login')
 })
 
-router.get('/register', (req,res) => {
+router.get('/register', (req, res) => {
     res.render('home/register')
 })
 
