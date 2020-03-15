@@ -1,7 +1,5 @@
 <h1>All Posts</h1>
 
-{{> home/form-messages}}
-
 <table class="table table-bordered">
     <thead>
         <tr>
@@ -10,7 +8,7 @@
             <th>Title</th>
             <th>Status</th>
             <th>Allow Comments</th>
-            {{!-- <th>Body</th> --}}
+            <th>Date</th>
         </tr>
     </thead>
     <tbody>
@@ -21,6 +19,7 @@
             <td>{{this.title}}</td>
             <td>{{this.status}}</td>
             <td>{{this.allowComments}}</td>
+            <td>{{generateTime this.date 'MMMM Do YYYY'}}</td>
             <td><a href="/admin/posts/edit/{{this.id}}" class="btn btn-info">Edit</a></td>
             <td>
                 <form action="/admin/posts/{{this.id}}?_method=DELETE" method="post">

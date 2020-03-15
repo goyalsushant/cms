@@ -12,15 +12,15 @@ const port = 3000
 
 mongoose.Promise = global.Promise;
 
-mongoose.connect('mongodb://127.0.0.1:27017/cms', { useMongoCLient: true, useNewUrlParser: true }).then(db => {
-    sole.log('Mongo database connected');
+mongoose.connect('mongodb://127.0.0.1:12017/cms', { useMongoCLient: true, useNewUrlParser: true }).then(db => {
+    console.log('Mongo database connected');
 }).catch(error => console.log(error));
 
 app.use(express.static(path.join(__dirname, 'public')))
 
 //View Engine
-const { select } = require('./helpers/handlebars-helper')
-app.engine('handlebars', exhbs({ defaultLayout: 'home', helpers: { select: select } }))
+const { select, generateTime } = require('./helpers/handlebars-helper')
+app.engine('handlebars', exhbs({ defaultLayout: 'home', helpers: { select: select, generateTime: generateTime } }))
 app.set('view engine', 'handlebars')
 
 //Upload Middleware
@@ -40,7 +40,7 @@ app.use(session({
 }))
 
 app.use(flash())
-app.use((req,res,next)=>{
+app.use((req, res, next) => {
     res.locals.success_message = req.flash('success_message')
     next()
 })
