@@ -7,6 +7,7 @@
             <th>File</th>
             <th>Title</th>
             <th>Status</th>
+            <th>Category</th>
             <th>Allow Comments</th>
             <th>Date</th>
         </tr>
@@ -18,6 +19,7 @@
             <td><img height="50" class="img-responsive" src="/uploads/{{file}}" alt=""></td>
             <td>{{this.title}}</td>
             <td>{{this.status}}</td>
+            <td>{{this.category}}</td>
             <td>{{this.allowComments}}</td>
             <td>{{generateDate this.date 'MMMM Do YYYY'}}</td>
             <td><a href="/admin/posts/edit/{{this.id}}" class="btn btn-info">Edit</a></td>
