@@ -13,7 +13,7 @@ router.all('/*', (req, res, next) => {
 })
 
 router.get('/', (req, res) => {
-    Post.find({}).then(posts => {
+    Post.find({}).populate('user').then(posts => {
         Category.find({}).then(categories => {
             const context = {
                 post: posts.map(post => {
@@ -30,7 +30,8 @@ router.get('/', (req, res) => {
                         allowComments: post.allowComments,
                         file: post.file,
                         date: post.date,
-                        body: post.body
+                        body: post.body,
+                        user: post.user.firstName
                     }
                 }),
                 category: categories.map(category => {
@@ -81,6 +82,7 @@ passport.deserializeUser((id, done) => {
                 firstName: user.firstName,
                 lastName: user.lastName,
                 email: user.email,
+                id: user.id
             },
         }
         done(err, context.user)
@@ -163,33 +165,42 @@ router.post('/register', (req, res) => {
 })
 
 router.get('/post/:id', (req, res) => {
-    Post.findOne({ _id: req.params.id }).then(post => {
-        Category.find({}).then(categories => {
-            if (post.file) {
-                post.file = `/uploads/${post.file}`
-            }
-            else {
-                post.file = 'http://placehold.it/900x300'
-            }
-            const context = {
-                post: {
-                    title: post.title,
-                    status: post.status,
-                    body: post.body,
-                    allowComments: post.allowComments,
-                    id: post.id,
-                    file: post.file,
-                    date: post.date
-                },
-                category: categories.map(category => {
-                    return {
-                        name: category.name
-                    }
-                })
-            }
-            res.render('home/post', { post: context.post, categories: context.category })
+    Post.findOne({ _id: req.params.id })
+        .populate({ path: 'comments', populate: { path: 'user', model: 'users' } })
+        .populate('user').then(post => {
+            Category.find({}).then(categories => {
+                if (post.file) {
+                    post.file = `/uploads/${post.file}`
+                }
+                else {
+                    post.file = 'http://placehold.it/900x300'
+                }
+                const context = {
+                    comment: post.comments.map(comment => {
+                        return {
+                            user: comment.user.firstName,
+                            body: comment.body
+                        }
+                    }),
+                    post: {
+                        title: post.title,
+                        status: post.status,
+                        body: post.body,
+                        allowComments: post.allowComments,
+                        id: post.id,
+                        file: post.file,
+                        date: post.date,
+                        user: post.user.firstName
+                    },
+                    category: categories.map(category => {
+                        return {
+                            name: category.name
+                        }
+                    })
+                }
+                res.render('home/post', { post: context.post, categories: context.category, comments: context.comment })
+            })
         })
-    })
 })
 
 module.exports = router

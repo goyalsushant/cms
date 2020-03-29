@@ -3,7 +3,10 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const PostSchema = new Schema({
-    // user: {},
+    user: {
+        type: Schema.Types.ObjectId,
+        ref: 'users'
+    },
     category: {
         type: Schema.Types.ObjectId,
         ref: 'categories'
@@ -30,8 +33,12 @@ const PostSchema = new Schema({
     date: {
         type: Date,
         default: Date.now()
-    }
-});
+    },
+    comments: [{
+        type: Schema.Types.ObjectId,
+        ref: 'comments'
+    }]
+}, { usePushEach: true });
 
 
 module.exports = mongoose.model('posts', PostSchema)

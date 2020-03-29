@@ -13,28 +13,57 @@ router.all('/*', (req, res, next) => {
 })
 
 router.get('/', (req, res) => {
-    Post.find({}).populate('category').then(posts => {
-        const context = {
-            post: posts.map(post => {
-                let categoryName = ''
-                if (post.category) {
-                    categoryName = post.category.name
-                }
-                return {
-                    status: post.status,
-                    title: post.title,
-                    id: post.id,
-                    allowComments: post.allowComments,
-                    file: post.file,
-                    date: post.date,
-                    category: categoryName
-                }
-            })
-        }
-        res.render('admin/posts', { posts: context.post })
-    }).catch(err => {
-        console.log(err)
-    })
+    Post.find({}).populate('category')
+        .populate('user').then(posts => {
+            const context = {
+                post: posts.map(post => {
+                    let categoryName = ''
+                    if (post.category) {
+                        categoryName = post.category.name
+                    }
+                    return {
+                        status: post.status,
+                        title: post.title,
+                        id: post.id,
+                        allowComments: post.allowComments,
+                        file: post.file,
+                        date: post.date,
+                        category: categoryName,
+                        user: post.user.firstName
+                    }
+                })
+            }
+            res.render('admin/posts', { posts: context.post })
+        }).catch(err => {
+            console.log(err)
+        })
+})
+
+router.get('/ownPosts', (req, res) => {
+    Post.find({ user: req.user.id }).populate('category')
+        .populate('user').then(posts => {
+            const context = {
+                post: posts.map(post => {
+                    let categoryName = ''
+                    if (post.category) {
+                        categoryName = post.category.name
+                    }
+                    return {
+                        status: post.status,
+                        title: post.title,
+                        id: post.id,
+                        allowComments: post.allowComments,
+                        file: post.file,
+                        date: post.date,
+                        category: categoryName,
+                        user: post.user.firstName
+                    }
+                })
+            }
+            res.render('admin/posts/ownPosts', { posts: context.post })
+        }).catch(err => {
+            console.log(err)
+        })
 })
 
 router.get('/create', (req, res) => {
@@ -91,7 +120,8 @@ router.post('/create', (req, res) => {
             allowComments: allowComments,
             body: req.body.body,
             file: filename,
-            category: req.body.category
+            category: req.body.category,
+            user: req.user.id
         })
 
         newPost.save().then(savedPost => {
@@ -141,6 +171,7 @@ router.put('/edit/:id', (req, res) => {
         else {
             allowComments = false;
         }
+        post.user = req.user.id
         post.title = req.body.title
         post.status = req.body.status
         post.allowComments = allowComments
@@ -168,12 +199,17 @@ router.put('/edit/:id', (req, res) => {
 })
 
 router.delete('/:id', (req, res) => {
-    Post.findOne({ _id: req.params.id }).then(post => {
-        req.flash('success_message', `Post ${post.title} was deleted successfully`)
-
+    Post.findOne({ _id: req.params.id }).populate('comments').then(post => {
         fs.unlink(uploadDir + post.file, (err) => {
-            post.remove()
-            res.redirect('/admin/posts')
+            if (!post.comments.length < 1) {
+                post.comments.forEach(comment => {
+                    comment.remove()
+                });
+            }
+            post.remove().then(removedPost => {
+                req.flash('success_message', `Post ${post.title} was deleted successfully`)
+                res.redirect('/admin/posts')
+            })
 
         })
     }).catch(err => {

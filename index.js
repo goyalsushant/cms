@@ -59,10 +59,12 @@ const home = require('./routes/home/route')
 const admin = require('./routes/admin/route')
 const posts = require('./routes/admin/posts')
 const categories = require('./routes/admin/categories')
+const comments = require('./routes/admin/comments')
 
 app.use('/', home)
 app.use('/admin', admin)
 app.use('/admin/posts', posts)
 app.use('/admin/categories', categories)
+app.use('/admin/comments', comments)
 
 app.listen(port, () => console.log(`Example app listening on port ${port}`))

@@ -11,6 +11,7 @@
             <th>Allow Comments</th>
             <th>Created By</th>
             <th>Date</th>
+            <th colspan="2">Operations</th>
         </tr>
     </thead>
     <tbody>
@@ -24,6 +25,12 @@
             <td>{{this.allowComments}}</td>
             <td><strong>{{this.user}}</strong></td>
             <td>{{generateDate this.date 'MMMM Do YYYY'}}</td>
+            <td><a href="/admin/posts/edit/{{this.id}}" class="btn btn-info">Edit</a></td>
+            <td>
+                <form action="/admin/posts/{{this.id}}?_method=DELETE" method="post">
+                    <button type="submit" class="btn btn-danger">DELETE</button>
+                </form>
+            </td>
         </tr>
         {{/each}}
     </tbody>
