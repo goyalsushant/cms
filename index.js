@@ -15,7 +15,7 @@ const port = 3000
 
 mongoose.Promise = global.Promise;
 
-mongoose.connect(mongoDbUrl, { useMongoCLient: true, useNewUrlParser: true }).then(db => {
+mongoose.connect(mongoDbUrl, { useNewUrlParser: true, useFindAndModify: false, useUnifiedTopology: true }).then(db => {
     console.log('Mongo database connected');
 }).catch(error => console.log(error));
 

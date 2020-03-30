@@ -188,7 +188,7 @@ router.put('/edit/:id', (req, res) => {
         }
         post.save().then(updatedPost => {
             req.flash('success_message', `Post ${updatedPost.title} was updated successfully`)
-            res.redirect('/admin/posts')
+            res.redirect('/admin/posts/ownPosts')
         }).catch(err => {
             req.flash('success_message', `There was some error while updating ${updatedPost.title} post`)
             console.log(err)
@@ -208,7 +208,7 @@ router.delete('/:id', (req, res) => {
             }
             post.remove().then(removedPost => {
                 req.flash('success_message', `Post ${post.title} was deleted successfully`)
-                res.redirect('/admin/posts')
+                res.redirect('/admin/posts/ownPosts')
             })
 
         })

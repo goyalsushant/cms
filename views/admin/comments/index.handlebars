@@ -5,6 +5,7 @@
         <tr>
             <th>ID</th>
             <th>Owner</th>
+            <th>Comment Status</th>
             <th>Date</th>
             <th>Operations</th>
         </tr>
@@ -14,6 +15,8 @@
         <tr>
             <td>{{this.id}}</td>
             <td>{{this.user}}</td>
+            <td><input data-id="{{this.id}}" type="checkbox" {{#if this.approveComment}}checked{{/if}}
+                    name="approveComment" id=""></td>
             <td>{{generateDate this.date 'MMMM Do YYYY'}}</td>
             <td>
                 <form action="/admin/comments/{{this.id}}?_method=DELETE" method="post">
